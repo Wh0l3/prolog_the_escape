@@ -70,8 +70,8 @@ findwayout(X):-
     finalroom(X),
     write('You found a way out!').
 
-findwayout(X):-
-    door(true,Z), con(X,Y,Z), finalroom(Y),
+con(X,Y):-
+    door(true,Z), con(X,Y,Z), findwayout(Y),
     write('You found a way out!').
 /*
 findwayout(X,Y,Z):-
