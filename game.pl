@@ -9,22 +9,22 @@ room(h).
 room(i).
 room(j).
 room(k).
-/* room without doors */
+/* room without doors  */
 room(lost).
 
-door(true, 1).
-door(true, 2).
-door(true, 3).
-door(true, 4).
-door(true, 5).
-door(true, 6).
-door(true, 7).
-door(true, 8).
-door(true, 9).
-door(true, 10).
-door(true, 11).
-door(true, 12).
-door(true, 13).
+door(1).
+door(2).
+door(3).
+door(4).
+door(5).
+door(6).
+door(7).
+door(8).
+door(9).
+door(10).
+door(11).
+door(12).
+door(13).
 
 con(a,b, 1).
 con(b,a, 1).
@@ -64,28 +64,23 @@ con(h,k, 12).
 
 con(e,exit,13).
 
+removeHead([_|Tail], Tail).
 
+startGame(StartRoom) :-
+  gameLoop(StartRoom,[],[[7,8,1], [7,8,1,13,9],[7,8,1,13,9,5,10],[7,8,1,13,9,5,10,2,11],[7,8,1,13,9,5,10,2,11,1,12]],[[e, i],[c,d],[b,j],[a,k],[h,h]])
+  .
 
-/*
-findwayout(e).
-
-findwayout(FromRoom):-
-    con(FromRoom,ToRoom,Door),
-    door(true,Door),
-    findwayout(ToRoom).
-*/
-findwayout(A) :-   % two nodes are connected, if
-  walk(A,[])       % - if we can walk from one to the other,
-  .                % first seeding the visited list with the empty list
-
-walk(A,V) :-       % we can walk from A to B...
-  con(A,X,Door),
-  door(true,Door),                   % - if A is connected to X, and
-  not(member(X,V)), % - we haven't yet visited X, and
-  (                  % - either
-    exit = X            %   - X is the desired destination
-  ;                  %   OR
-    walk(X,[A|V])  %   - we can get to it from X
-  )                  %
-  .                  % Easy!
+gameLoop(CurrentRoom,VisitedRooms, OpenDoors, GuardsPositions) :-
+  con(CurrentRoom,NextRoom,Door),
+  member(Door,OpenDoors),
+  not(member(NextRoom,GuardsPositions)),
+  not(member(CurrentRoom,VisitedRooms)),
+  (
+    exit = NextRoom
+  ;
+    removeHead(GuardsPositions, NewGuardsPositions),
+    removeHead(OpenDoors, NewOpenDoors),
+    gameLoop(NextRoom,[CurrentRoom|VisitedRooms], NewOpenDoors, NewGuardsPositions)
+  )
+  .
 
