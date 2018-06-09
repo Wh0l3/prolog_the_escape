@@ -66,6 +66,21 @@ con(e,exit,13).
 
 removeHead([_|Tail], Tail).
 
+minimal([F|R], M) :- min(R,F, M).
+% minimal path
+min([],M,M).
+min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min). 
+min([_|R],M,Min) :- min(R,M,Min).
+
+co(X,L) :- co(X,[],L).
+
+co([],A,A).
+co([X|Xs], A, L) :- p(X-Z,A,R), !, Z1 is Z+1, co(Xs, [X-Z1|R], L). 
+co([X|Xs], A, L) :- co(Xs, [X-1|A], L). 
+
+p(X-Y,[X-Y|R],R):- !.
+p(X,[H|Y], [H|Z]) :- p(X,Y,Z).
+
 startGame(StartRoom) :-
   gameLoop(StartRoom,[],[[7,8,1], [7,8,1,13,9],[7,8,1,13,9,5,10],[7,8,1,13,9,5,10,2,11],[7,8,1,13,9,5,10,2,11,1,12]],[[e, i],[c,d],[b,j],[a,k],[h,h]])
   .
@@ -74,7 +89,7 @@ gameLoop(CurrentRoom,VisitedRooms, OpenDoors, GuardsPositions) :-
   con(CurrentRoom,NextRoom,Door),
   member(Door,OpenDoors),
   not(member(NextRoom,GuardsPositions)),
-  not(member(CurrentRoom,VisitedRooms)),
+  minimal(VisitedRooms, co(NextRoom,VisitedRooms)),
   (
     exit = NextRoom
   ;
@@ -82,5 +97,4 @@ gameLoop(CurrentRoom,VisitedRooms, OpenDoors, GuardsPositions) :-
     removeHead(OpenDoors, NewOpenDoors),
     gameLoop(NextRoom,[CurrentRoom|VisitedRooms], NewOpenDoors, NewGuardsPositions)
   )
-  .
-
+.
