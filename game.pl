@@ -87,9 +87,9 @@ startGame(StartRoom) :-
 
 gameLoop(CurrentRoom,VisitedRooms, OpenDoors, GuardsPositions) :-
   con(CurrentRoom,NextRoom,Door),
-  member(Door,OpenDoors),
+  member(Door,[_|OpenDoors]),
   not(member(NextRoom,GuardsPositions)),
-  minimal(VisitedRooms, co(NextRoom,VisitedRooms)),
+  not(member(NextRoom, VisitedRooms)),
   (
     exit = NextRoom
   ;
